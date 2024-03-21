@@ -10,6 +10,17 @@
 
 #include <JuceHeader.h>
 
+// FILTER CHAIN, PARAMETRIEN EXCTRACT APVTS:TÄ
+
+struct ChainSettings
+{
+    float peakFreq { 0 }, peakGainInDecibels { 0 }, peakQuality {1.f};
+    float lowCutFreq { 0 }, highCutFreq { 0 };
+    int lowCutSlope { 0 }, highCutSlope { 0 };
+};
+
+ChainSettings getChainSettings(juce::AudioProcessorValueTreeState& apvts);
+
 //==============================================================================
 /**
 */
@@ -69,6 +80,15 @@ private:
     using MonoChain = juce::dsp::ProcessorChain<CutFilter, Filter, CutFilter>;
 
     MonoChain leftChain, rightChain;
+
+// ENUMERATION
+
+    enum ChainPositions
+    {
+        LowCut,
+        Peak,
+        HighCut
+    };
 
 
     //==============================================================================
