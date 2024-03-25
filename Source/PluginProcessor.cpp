@@ -462,26 +462,38 @@ bool EQ1AudioProcessor::hasEditor() const
     return true; // (change this to false if you choose to not supply an editor)
 }
 
+// GUI, generic näyttää generic gui komponentit, return new näyttää omat/custom (aluksi Hello World)
 juce::AudioProcessorEditor* EQ1AudioProcessor::createEditor()
 {
-//    return new EQ1AudioProcessorEditor (*this);
-
-    //  GenericAudioProcessorEditor näyttää plugarin parametrit (GUI)
-    return new juce::GenericAudioProcessorEditor(*this);
+    return new EQ1AudioProcessorEditor (*this);
+   // GenericAudioProcessorEditor näyttää plugarin parametrit (GUI)
+   // return new juce::GenericAudioProcessorEditor(*this);
 }
 
-//==============================================================================
+// GET STATE, tallennus
+// ==============================================================================
 void EQ1AudioProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
+
+    juce::MemoryOutputStream mos(destData, true);
+    apvts.state.writeToStream(mos);
 }
 
+// GET STATE, restore
 void EQ1AudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
+
+    auto tree = juce::ValueTree::readFromData(data, sizeInBytes);
+    if( tree.isValid() )
+    {
+        apvts.replaceState(tree);
+        updateFilters();
+    }
 }
 
 // GET PARAMETER VALUE
