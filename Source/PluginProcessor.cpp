@@ -519,21 +519,32 @@ ChainSettings getChainSettings(juce::AudioProcessorValueTreeState& apvts)
     return settings;
 }
 
-// REFACTORING
-void EQ1AudioProcessor::updatePeakFilter(const ChainSettings &chainSettings)
+Coefficients makePeakFilter(const ChainSettings& chainSettings, double sampleRate)
 {
-    auto peakCoefficients = juce::dsp::IIR::Coefficients<float>::makePeakFilter(getSampleRate(),
+    return juce::dsp::IIR::Coefficients<float>::makePeakFilter(sampleRate,
         chainSettings.peakFreq,
         chainSettings.peakQuality,
         juce::Decibels::decibelsToGain(chainSettings.peakGainInDecibels));
+}
+
+// REFACTORING
+void EQ1AudioProcessor::updatePeakFilter(const ChainSettings &chainSettings)
+{
+ //   auto peakCoefficients = juce::dsp::IIR::Coefficients<float>::makePeakFilter(getSampleRate(),
+ //       chainSettings.peakFreq,
+ //       chainSettings.peakQuality,
+ //       juce::Decibels::decibelsToGain(chainSettings.peakGainInDecibels));
 
 //    *leftChain.get<ChainPositions::Peak>().coefficients = *peakCoefficients;
 //    *rightChain.get<ChainPositions::Peak>().coefficients = *peakCoefficients;
+
+    auto peakCoefficients = makePeakFilter(chainSettings, getSampleRate());
+
     updateCoefficients(leftChain.get<ChainPositions::Peak>().coefficients, peakCoefficients);
     updateCoefficients(rightChain.get<ChainPositions::Peak>().coefficients, peakCoefficients);
 }
 
-void EQ1AudioProcessor::updateCoefficients(Coefficients &old, const Coefficients &replacements)
+void /*EQ1AudioProcessor::*/updateCoefficients(Coefficients& old, const Coefficients& replacements)
 {
     *old = *replacements;
 }
